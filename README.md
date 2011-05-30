@@ -17,15 +17,15 @@ Usage
 
         Cyclop.db = Mongo::Connection.new["database_name"]
 
-  or with Replica-Sets
+    or with Replica-Sets
 
         Cyclop.db = Mongo::ReplSetConnection.new["database_name"]
 
-  or if you're using MongoMapper:
+    or if you're using MongoMapper:
 
         Cyclop.db = MongoMapper.database
 
-  or if you're using Mongoid:
+    or if you're using Mongoid:
 
         Cyclop.db = Mongoid.database
 
