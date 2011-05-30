@@ -1,1 +1,258 @@
-My GitHub Page
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>cyclop.rb</title>
+  <link rel="stylesheet" href="http://jashkenas.github.com/docco/resources/docco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div id="jump_to">
+    Jump To &hellip;
+    <div id="jump_wrapper">
+      <div id="jump_page">
+          <a class="source" href="cyclop.html">cyclop.rb</a>
+          <a class="source" href="cyclop/job.html">job.rb</a>
+          <a class="source" href="cyclop/version.html">version.rb</a>
+      </div>
+    </div>
+  </div>
+  <table cellspacing=0 cellpadding=0>
+  <thead>
+    <tr>
+      <th class=docs><h1>cyclop.rb</h1></th>
+      <th class=code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr id='section-1'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-1">&#182;</a>
+        </div>
+        
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="nb">require</span> <span class="s2">&quot;mongo&quot;</span>
+
+<span class="nb">require</span> <span class="s2">&quot;socket&quot;</span>
+<span class="nb">require</span> <span class="s2">&quot;cyclop/job&quot;</span>
+
+<span class="k">module</span> <span class="nn">Cyclop</span>
+  <span class="kp">extend</span> <span class="nb">self</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-2'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-2">&#182;</a>
+        </div>
+        <p>Raised if db not set or connection error</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="k">class</span> <span class="nc">DatabaseNotAvailable</span> <span class="o">&lt;</span> <span class="no">StandardError</span><span class="p">;</span> <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-3'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-3">&#182;</a>
+        </div>
+        <p>Sets which <code>Mongo::DB</code> to use</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="k">def</span> <span class="nf">db</span><span class="o">=</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+    <span class="vi">@db</span> <span class="o">=</span> <span class="n">db</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">db</span>
+    <span class="vi">@db</span>
+  <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-4'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-4">&#182;</a>
+        </div>
+        <p>Get memoized host</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="k">def</span> <span class="nf">host</span>
+    <span class="vi">@host</span> <span class="o">||=</span> <span class="no">Socket</span><span class="o">.</span><span class="n">gethostname</span>
+  <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-5'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-5">&#182;</a>
+        </div>
+        <p>Queues a new job</p>
+
+<p>  Minimum usage:</p>
+
+<pre><code>Cyclop.push queue: "refresh_cache"
+</code></pre>
+
+<p>  With <code>:job_params</code>:</p>
+
+<pre><code># with an `Array`
+Cyclop.push queue: "email", job_params: ["1", :welcome]
+
+# with a `Hash`
+Cyclop.push queue: "email", job_params: {user_id: "1",
+type: "welcome"}
+</code></pre>
+
+<p>  With <code>:delay</code>:</p>
+
+<pre><code># Will not perform the task before a delay of 60 seconds
+Cyclop.push queue: "email", delay: 60
+</code></pre>
+
+<p>  With <code>:retries</code> and <code>:splay</code>:</p>
+
+<pre><code># Will mark the task as failed only after 3 retries
+Cyclop.push queue: "email", retries: 3
+
+# Will mark the task as failed only after 2 retries
+# and 30 seconds between each retry
+Cyclop.push queue: "email", retries: 2, splay: 30
+</code></pre>
+
+<p>Parameters:</p>
+
+<ul>
+<li>(Hash) opts (defaults to: {}) &ndash; a customizable set of options. The minimum required is :queue.</li>
+</ul>
+
+
+<p>Options Hash (opts):</p>
+
+<ul>
+<li>(Symbol, String) :queue &ndash; name of the queue (required).</li>
+<li>(Array, Hash) :job_params (nil) &ndash; parameters to send to the <code>Cyclop::Job#perform</code> method.</li>
+<li>(Integer) :delay (0) &ndash; time to wait in <code>seconds</code> before the task should be performed.</li>
+<li>(Integer) :retries (0) &ndash; number of retries before the <code>Cyclop::Job</code> is marked as failed.</li>
+<li>(Integer) :splay (60) &ndash; time to wait in <code>seconds</code> between retry.</li>
+<li>(String) :host (Cyclop.host) &ndash; host under which the <code>Cyclop::Job</code> should be added.</li>
+</ul>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="k">def</span> <span class="nf">push</span><span class="p">(</span><span class="n">opts</span><span class="o">=</span><span class="p">{})</span>
+    <span class="no">Cyclop</span><span class="o">::</span><span class="no">Job</span><span class="o">.</span><span class="n">create</span> <span class="n">opts</span>
+  <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-6'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-6">&#182;</a>
+        </div>
+        <p>Get a <code>Cyclop::Job</code> to process</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li>(Symbol, String) queues &ndash; list of queues to get a <code>Cyclop::Job</code> from. Defaults to all.</li>
+<li>(Hash) opts (defaults to: {}) &ndash; a customizable set of options.</li>
+</ul>
+
+
+<p>Options Hash (opts):</p>
+
+<ul>
+<li>(String) :host &ndash; limit to <code>Cyclop::Job</code>s queued by this host.</li>
+</ul>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+  <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-7'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-7">&#182;</a>
+        </div>
+        <p>Get failed <code>Cyclop::Job</code>s</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li>(Hash) opts (defaults to: {}) &ndash; a customizable set of options.</li>
+</ul>
+
+
+<p>Options Hash (opts):</p>
+
+<ul>
+<li>(Integer) :skip (0) &ndash; number of <code>Cyclop::Job</code>s to skip.</li>
+<li>(Integer) :limit (nil) &ndash; maximum number of <code>Cyclop::Job</code>s to return.</li>
+</ul>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="k">def</span> <span class="nf">failed</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+  <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-8'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-8">&#182;</a>
+        </div>
+        <p>Get a failed <code>Cyclop::Job</code> to process</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li>(Symbol, String) args &ndash; list of queues to get a <code>Cyclop::Job</code> from. Defaults to all.</li>
+<li>(Hash) opts (defaults to: {}) &ndash; a customizable set of options.</li>
+</ul>
+
+
+<p>Options Hash (opts):</p>
+
+<ul>
+<li>(String) :host &ndash; limit to <code>Cyclop::Job</code>s queued by this host.</li>
+</ul>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="k">def</span> <span class="nf">next_failed</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+  <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-9'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-9">&#182;</a>
+        </div>
+        <p>Spawn a <code>Cyclop::Worker</code></p>
+
+<p>Parameters:</p>
+
+<ul>
+<li>(Symbol, String) args &ndash; list of queues to get <code>Cyclop::Job</code> from. Defaults to all.</li>
+<li>(Hash) opts (defaults to: {}) &ndash; a customizable set of options.</li>
+</ul>
+
+
+<p>Options Hash (opts):</p>
+
+<ul>
+<li>(String) :host &ndash; limit to <code>Cyclop::Job</code>s queued by this host.</li>
+</ul>
+
+
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="k">def</span> <span class="nf">spawn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+  </table>
+</div>
+</body>
