@@ -16,9 +16,15 @@ begin
   task :read => :docs do
     sh 'open docs/lib/cyclop.html'
   end
+  
+  # Make index.html a copy of rocco.html
+  file 'docs/index.html' => 'docs/lib/rocco.html' do |f|
+    cp 'docs/lib/rocco.html', 'docs/index.html', :preserve => true
+  end
+  task :docs => 'docs/index.html'
+  CLEAN.include 'docs/index.html'
 
   # GITHUB PAGES ===============================================================
-
   desc 'Update gh-pages branch'
   task :pages => ['docs/.git', :docs] do
     rev = `git rev-parse --short HEAD`.strip
