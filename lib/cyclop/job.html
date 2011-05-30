@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>job.rb</title>
+  <link rel="stylesheet" href="http://jashkenas.github.com/docco/resources/docco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div id="jump_to">
+    Jump To &hellip;
+    <div id="jump_wrapper">
+      <div id="jump_page">
+          <a class="source" href="../cyclop.html">cyclop.rb</a>
+          <a class="source" href="job.html">job.rb</a>
+          <a class="source" href="version.html">version.rb</a>
+      </div>
+    </div>
+  </div>
+  <table cellspacing=0 cellpadding=0>
+  <thead>
+    <tr>
+      <th class=docs><h1>job.rb</h1></th>
+      <th class=code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr id='section-1'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-1">&#182;</a>
+        </div>
+        
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="k">module</span> <span class="nn">Cyclop</span>
+  <span class="k">class</span> <span class="nc">Job</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-2'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-2">&#182;</a>
+        </div>
+        <p>Unique identifier</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:id</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-3'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-3">&#182;</a>
+        </div>
+        <p>Queue name</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:queue</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-4'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-4">&#182;</a>
+        </div>
+        <p>Parameters sent to <code>#perform</code></p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:job_params</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-5'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-5">&#182;</a>
+        </div>
+        <p>Delay in seconds</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:delay</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-6'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-6">&#182;</a>
+        </div>
+        <p>Number of retries before being marked as failed</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:retries</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-7'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-7">&#182;</a>
+        </div>
+        <p>Time in seconds between retry</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:splay</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-8'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-8">&#182;</a>
+        </div>
+        <p>Host it&rsquo;s added under</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:created_by</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-9'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-9">&#182;</a>
+        </div>
+        <p>Time it was created</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:created_at</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-10'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-10">&#182;</a>
+        </div>
+        <p>Time it was last updated</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:updated_at</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-11'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-11">&#182;</a>
+        </div>
+        <p>Worker unique identifier</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:locked_by</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-12'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-12">&#182;</a>
+        </div>
+        <p>Time when worker started</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:locked_at</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-13'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-13">&#182;</a>
+        </div>
+        <p>Number of unsuccessful attempts</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:attempts</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-14'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-14">&#182;</a>
+        </div>
+        <p>Backtraces of unsuccessful attempts</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:errors</span>
+
+    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">opts</span><span class="o">=</span><span class="p">{})</span>
+      <span class="k">raise</span> <span class="no">ArgumentError</span><span class="p">,</span> <span class="s2">&quot;:queue is required&quot;</span> <span class="k">unless</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:queue</span><span class="o">]</span>
+      <span class="nb">self</span><span class="o">.</span><span class="n">queue</span> <span class="o">=</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:queue</span><span class="o">]</span>
+      <span class="nb">self</span><span class="o">.</span><span class="n">job_params</span> <span class="o">=</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:job_params</span><span class="o">]</span>
+      <span class="nb">self</span><span class="o">.</span><span class="n">delay</span> <span class="o">=</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:delay</span><span class="o">]</span> <span class="o">||</span> <span class="mi">0</span>
+      <span class="nb">self</span><span class="o">.</span><span class="n">retries</span> <span class="o">=</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:retries</span><span class="o">]</span> <span class="o">||</span> <span class="mi">0</span>
+      <span class="nb">self</span><span class="o">.</span><span class="n">splay</span> <span class="o">=</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:splay</span><span class="o">]</span> <span class="o">||</span> <span class="mi">60</span>
+      <span class="nb">self</span><span class="o">.</span><span class="n">created_by</span> <span class="o">=</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:host</span><span class="o">]</span> <span class="o">||</span> <span class="no">Cyclop</span><span class="o">.</span><span class="n">host</span>
+      <span class="nb">self</span><span class="o">.</span><span class="n">attempts</span> <span class="o">=</span> <span class="mi">0</span>
+      <span class="nb">self</span><span class="o">.</span><span class="n">errors</span> <span class="o">=</span> <span class="o">[]</span>
+    <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-15'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-15">&#182;</a>
+        </div>
+        <p>Create a new job and save it to the queue specified in <code>opts[:queue]</code></p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">create</span><span class="p">(</span><span class="n">opts</span><span class="o">=</span><span class="p">{})</span>
+      <span class="n">job</span> <span class="o">=</span> <span class="kp">new</span> <span class="n">opts</span>
+      <span class="n">job</span><span class="o">.</span><span class="n">save</span>
+      <span class="n">job</span>
+    <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-16'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-16">&#182;</a>
+        </div>
+        <p>Save to queue</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="k">def</span> <span class="nf">save</span>
+      <span class="nb">self</span><span class="o">.</span><span class="n">updated_at</span> <span class="o">=</span> <span class="no">Time</span><span class="o">.</span><span class="n">now</span>
+      <span class="k">if</span> <span class="n">persisted?</span>
+        <span class="k">raise</span> <span class="no">NotImplementedError</span>
+      <span class="k">else</span>
+        <span class="nb">self</span><span class="o">.</span><span class="n">created_at</span> <span class="o">=</span> <span class="n">updated_at</span>
+        <span class="nb">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">insert</span> <span class="n">attributes</span><span class="p">,</span> <span class="n">safe</span><span class="p">:</span> <span class="kp">true</span>
+      <span class="k">end</span>
+      <span class="kp">true</span>
+    <span class="k">rescue</span> <span class="no">Mongo</span><span class="o">::</span><span class="no">OperationFailure</span>
+      <span class="kp">false</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">reload</span>
+      <span class="n">doc</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">find_one</span> <span class="nb">id</span>
+      <span class="n">attributes</span><span class="o">.</span><span class="n">each</span><span class="p">{</span><span class="o">|</span><span class="kp">attr</span><span class="p">,</span> <span class="n">_</span><span class="o">|</span> <span class="nb">send</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="kp">attr</span><span class="si">}</span><span class="s2">=&quot;</span><span class="p">,</span> <span class="n">doc</span><span class="o">[</span><span class="kp">attr</span><span class="o">.</span><span class="n">to_s</span><span class="o">]</span><span class="p">}</span>
+      <span class="nb">self</span>
+    <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-17'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-17">&#182;</a>
+        </div>
+        <p>If we have an id the object is persisted</p>
+
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="k">def</span> <span class="nf">persisted?</span>
+      <span class="o">!!</span><span class="nb">self</span><span class="o">.</span><span class="n">id</span>
+    <span class="k">end</span>
+
+  <span class="kp">private</span>
+    <span class="k">def</span> <span class="nf">collection</span>
+      <span class="vi">@collection</span> <span class="o">||=</span> <span class="no">Cyclop</span><span class="o">.</span><span class="n">db</span> <span class="p">?</span> 
+        <span class="no">Cyclop</span><span class="o">.</span><span class="n">db</span><span class="o">[</span><span class="s2">&quot;cyclop_jobs&quot;</span><span class="o">]</span> <span class="p">:</span> <span class="k">raise</span><span class="p">(</span><span class="no">Cyclop</span><span class="o">::</span><span class="no">DatabaseNotAvailable</span><span class="p">)</span>
+    <span class="k">end</span>
+    
+    <span class="k">def</span> <span class="nf">attributes</span>
+      <span class="p">{</span>
+        <span class="n">queue</span><span class="p">:</span> <span class="n">queue</span><span class="p">,</span>
+        <span class="n">job_params</span><span class="p">:</span> <span class="n">job_params</span><span class="p">,</span>
+        <span class="n">delay</span><span class="p">:</span> <span class="n">delay</span><span class="p">,</span>
+        <span class="n">retries</span><span class="p">:</span> <span class="n">retries</span><span class="p">,</span>
+        <span class="n">splay</span><span class="p">:</span> <span class="n">splay</span><span class="p">,</span>
+        <span class="n">created_by</span><span class="p">:</span> <span class="n">created_by</span><span class="p">,</span>
+        <span class="n">created_at</span><span class="p">:</span> <span class="n">created_at</span><span class="p">,</span>
+        <span class="n">updated_at</span><span class="p">:</span> <span class="n">updated_at</span><span class="p">,</span>
+        <span class="n">locked_by</span><span class="p">:</span> <span class="n">locked_by</span><span class="p">,</span>
+        <span class="n">locked_at</span><span class="p">:</span> <span class="n">locked_at</span><span class="p">,</span>
+        <span class="n">attempts</span><span class="p">:</span> <span class="n">attempts</span><span class="p">,</span>
+        <span class="n">errors</span><span class="p">:</span> <span class="n">errors</span><span class="p">,</span>
+      <span class="p">}</span>
+    <span class="k">end</span>
+
+  <span class="k">end</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+  </table>
+</div>
+</body>
