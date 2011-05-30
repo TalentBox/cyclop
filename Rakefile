@@ -17,9 +17,9 @@ begin
     sh 'open docs/lib/cyclop.html'
   end
   
-  # Make index.html a copy of cyclop.html
-  file 'docs/index.html' => 'docs/lib/cyclop.html' do |f|
-    cp 'docs/lib/cyclop.html', 'docs/index.html', :preserve => true
+  # Make index.html meta redirect to lib/cyclop.html
+  file 'docs/index.html' do |f|
+    sh %Q{echo '<html><head><meta http-equiv="refresh" content="1;url=http://talentbox.github.com/cyclop/lib/cyclop.html"></head><body></body></html>' > docs/index.html}
   end
   task :docs => 'docs/index.html'
   CLEAN.include 'docs/index.html'
