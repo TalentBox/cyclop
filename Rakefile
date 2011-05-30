@@ -9,7 +9,7 @@ begin
   require 'rocco/tasks'
   Rocco::make 'docs/'
 
-  desc "Build Rocco Docs"
+  desc "Build Cyclop Docs"
   task :docs => :rocco
   
   desc 'Build docs and open in browser for the reading'
@@ -17,9 +17,9 @@ begin
     sh 'open docs/lib/cyclop.html'
   end
   
-  # Make index.html a copy of rocco.html
-  file 'docs/index.html' => 'docs/lib/rocco.html' do |f|
-    cp 'docs/lib/rocco.html', 'docs/index.html', :preserve => true
+  # Make index.html a copy of cyclop.html
+  file 'docs/index.html' => 'docs/lib/cyclop.html' do |f|
+    cp 'docs/lib/cyclop.html', 'docs/index.html', :preserve => true
   end
   task :docs => 'docs/index.html'
   CLEAN.include 'docs/index.html'
