@@ -46,7 +46,7 @@
         <p>Unique identifier</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:id</span></pre></div>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:_id</span></pre></div>
       </td>
     </tr>
     <tr id='section-3'>
@@ -87,10 +87,10 @@
         <div class="pilwrap">
           <a class="pilcrow" href="#section-6">&#182;</a>
         </div>
-        <p>Number of retries before being marked as failed</p>
+        <p>Time until we do start the job</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:retries</span></pre></div>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:delayed_until</span></pre></div>
       </td>
     </tr>
     <tr id='section-7'>
@@ -98,10 +98,10 @@
         <div class="pilwrap">
           <a class="pilcrow" href="#section-7">&#182;</a>
         </div>
-        <p>Time in seconds between retry</p>
+        <p>Number of retries before being marked as failed</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:splay</span></pre></div>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:retries</span></pre></div>
       </td>
     </tr>
     <tr id='section-8'>
@@ -109,10 +109,10 @@
         <div class="pilwrap">
           <a class="pilcrow" href="#section-8">&#182;</a>
         </div>
-        <p>Host it&rsquo;s added under</p>
+        <p>Time in seconds between retry</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:created_by</span></pre></div>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:splay</span></pre></div>
       </td>
     </tr>
     <tr id='section-9'>
@@ -120,10 +120,10 @@
         <div class="pilwrap">
           <a class="pilcrow" href="#section-9">&#182;</a>
         </div>
-        <p>Time it was created</p>
+        <p>Host it&rsquo;s added under</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:created_at</span></pre></div>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:created_by</span></pre></div>
       </td>
     </tr>
     <tr id='section-10'>
@@ -131,10 +131,10 @@
         <div class="pilwrap">
           <a class="pilcrow" href="#section-10">&#182;</a>
         </div>
-        <p>Time it was last updated</p>
+        <p>Time it was created</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:updated_at</span></pre></div>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:created_at</span></pre></div>
       </td>
     </tr>
     <tr id='section-11'>
@@ -142,10 +142,10 @@
         <div class="pilwrap">
           <a class="pilcrow" href="#section-11">&#182;</a>
         </div>
-        <p>Worker unique identifier</p>
+        <p>Time it was last updated</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:locked_by</span></pre></div>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:updated_at</span></pre></div>
       </td>
     </tr>
     <tr id='section-12'>
@@ -153,10 +153,10 @@
         <div class="pilwrap">
           <a class="pilcrow" href="#section-12">&#182;</a>
         </div>
-        <p>Time when worker started</p>
+        <p>Worker unique identifier</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:locked_at</span></pre></div>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:locked_by</span></pre></div>
       </td>
     </tr>
     <tr id='section-13'>
@@ -164,10 +164,10 @@
         <div class="pilwrap">
           <a class="pilcrow" href="#section-13">&#182;</a>
         </div>
-        <p>Number of unsuccessful attempts</p>
+        <p>Time when worker started</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:attempts</span></pre></div>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:locked_at</span></pre></div>
       </td>
     </tr>
     <tr id='section-14'>
@@ -175,28 +175,43 @@
         <div class="pilwrap">
           <a class="pilcrow" href="#section-14">&#182;</a>
         </div>
-        <p>Backtraces of unsuccessful attempts</p>
+        <p>Mark as failed</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:errors</span>
-
-    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">opts</span><span class="o">=</span><span class="p">{})</span>
-      <span class="k">raise</span> <span class="no">ArgumentError</span><span class="p">,</span> <span class="s2">&quot;:queue is required&quot;</span> <span class="k">unless</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:queue</span><span class="o">]</span>
-      <span class="nb">self</span><span class="o">.</span><span class="n">queue</span> <span class="o">=</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:queue</span><span class="o">]</span>
-      <span class="nb">self</span><span class="o">.</span><span class="n">job_params</span> <span class="o">=</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:job_params</span><span class="o">]</span>
-      <span class="nb">self</span><span class="o">.</span><span class="n">delay</span> <span class="o">=</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:delay</span><span class="o">]</span> <span class="o">||</span> <span class="mi">0</span>
-      <span class="nb">self</span><span class="o">.</span><span class="n">retries</span> <span class="o">=</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:retries</span><span class="o">]</span> <span class="o">||</span> <span class="mi">0</span>
-      <span class="nb">self</span><span class="o">.</span><span class="n">splay</span> <span class="o">=</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:splay</span><span class="o">]</span> <span class="o">||</span> <span class="mi">60</span>
-      <span class="nb">self</span><span class="o">.</span><span class="n">created_by</span> <span class="o">=</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:host</span><span class="o">]</span> <span class="o">||</span> <span class="no">Cyclop</span><span class="o">.</span><span class="n">host</span>
-      <span class="nb">self</span><span class="o">.</span><span class="n">attempts</span> <span class="o">=</span> <span class="mi">0</span>
-      <span class="nb">self</span><span class="o">.</span><span class="n">errors</span> <span class="o">=</span> <span class="o">[]</span>
-    <span class="k">end</span></pre></div>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:failed</span></pre></div>
       </td>
     </tr>
     <tr id='section-15'>
       <td class=docs>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-15">&#182;</a>
+        </div>
+        <p>Number of attempts</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:attempts</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-16'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-16">&#182;</a>
+        </div>
+        <p>Backtraces of unsuccessful attempts</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:errors</span>
+
+    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{})</span>
+      <span class="k">raise</span> <span class="no">ArgumentError</span><span class="p">,</span> <span class="s2">&quot;:queue is required&quot;</span> <span class="k">unless</span> <span class="n">attrs</span><span class="o">[</span><span class="s2">&quot;queue&quot;</span><span class="o">]</span> <span class="o">||</span> <span class="n">attrs</span><span class="o">[</span><span class="ss">:queue</span><span class="o">]</span>
+      <span class="nb">self</span><span class="o">.</span><span class="n">attributes</span> <span class="o">=</span> <span class="n">attrs</span>
+    <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-17'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-17">&#182;</a>
         </div>
         <p>Create a new job and save it to the queue specified in <code>opts[:queue]</code></p>
       </td>
@@ -208,21 +223,196 @@
     <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-16'>
+    <tr id='section-18'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-16">&#182;</a>
+          <a class="pilcrow" href="#section-18">&#182;</a>
+        </div>
+        <p>Get the next job from any <code>opts[:queues]</code> and mark it as locked</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">next</span><span class="p">(</span><span class="n">opts</span><span class="o">=</span><span class="p">{})</span>
+      <span class="k">raise</span> <span class="no">ArgumentError</span><span class="p">,</span> <span class="s2">&quot;locked_by is required&quot;</span> <span class="k">unless</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:locked_by</span><span class="o">]</span>
+
+      <span class="n">time_now</span> <span class="o">=</span> <span class="no">Time</span><span class="o">.</span><span class="n">now</span><span class="o">.</span><span class="n">utc</span>
+
+      <span class="n">conditions</span> <span class="o">=</span> <span class="p">{</span><span class="n">query</span><span class="p">:</span> <span class="p">{}}</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-19'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-19">&#182;</a>
+        </div>
+        <p>Not failed jobs only</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>      <span class="n">conditions</span><span class="o">[</span><span class="ss">:query</span><span class="o">][</span><span class="ss">:failed</span><span class="o">]</span> <span class="o">=</span> <span class="kp">false</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-20'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-20">&#182;</a>
+        </div>
+        <p>Only jobs generated by the specified host if present</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>      <span class="n">conditions</span><span class="o">[</span><span class="ss">:query</span><span class="o">][</span><span class="ss">:created_by</span><span class="o">]</span> <span class="o">=</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:host</span><span class="o">]</span> <span class="k">if</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:host</span><span class="o">]</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-21'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-21">&#182;</a>
+        </div>
+        <p>Skip delayed jobs</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>      <span class="n">conditions</span><span class="o">[</span><span class="ss">:query</span><span class="o">][</span><span class="ss">:delayed_until</span><span class="o">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;$lte&quot;</span> <span class="o">=&gt;</span> <span class="n">time_now</span><span class="p">}</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-22'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-22">&#182;</a>
+        </div>
+        <p>Filter by queue if present</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>      <span class="n">conditions</span><span class="o">[</span><span class="ss">:query</span><span class="o">][</span><span class="ss">:queue</span><span class="o">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;$in&quot;</span> <span class="o">=&gt;</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:queues</span><span class="o">]</span><span class="p">}</span> <span class="k">if</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:queues</span><span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">opts</span><span class="o">[</span><span class="ss">:queues</span><span class="o">].</span><span class="n">empty?</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-23'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-23">&#182;</a>
+        </div>
+        <p>Skip locked jobs</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>      <span class="n">conditions</span><span class="o">[</span><span class="ss">:query</span><span class="o">][</span><span class="s2">&quot;$or&quot;</span><span class="o">]</span> <span class="o">=</span> <span class="o">[</span><span class="p">{</span><span class="n">locked_at</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;$lte&quot;</span> <span class="o">=&gt;</span> <span class="n">time_now</span> <span class="o">-</span> <span class="mi">1800</span><span class="p">}},</span> <span class="p">{</span><span class="n">locked_at</span><span class="p">:</span> <span class="kp">nil</span><span class="p">}</span><span class="o">]</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-24'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-24">&#182;</a>
+        </div>
+        <p>Last chance to skip dead jobs</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>      <span class="n">conditions</span><span class="o">[</span><span class="ss">:query</span><span class="o">][</span><span class="s2">&quot;$where&quot;</span><span class="o">]</span> <span class="o">=</span> <span class="s2">&quot;this.attempts &lt;= this.retries&quot;</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-25'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-25">&#182;</a>
+        </div>
+        <p>Set <code>locked_by</code> with worker id and increment the number of attempts</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>      <span class="n">conditions</span><span class="o">[</span><span class="ss">:update</span><span class="o">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;$set&quot;</span> <span class="o">=&gt;</span> <span class="p">{</span>
+          <span class="n">locked_by</span><span class="p">:</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:locked_by</span><span class="o">]</span><span class="p">,</span>
+          <span class="n">locked_at</span><span class="p">:</span> <span class="n">time_now</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;$inc&quot;</span> <span class="o">=&gt;</span> <span class="p">{</span>
+          <span class="n">attempts</span><span class="p">:</span> <span class="mi">1</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+      </pre></div>
+      </td>
+    </tr>
+    <tr id='section-26'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-26">&#182;</a>
+        </div>
+        <p>Sort by <code>created_at</code></p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>      <span class="n">conditions</span><span class="o">[</span><span class="ss">:sort</span><span class="o">]</span> <span class="o">=</span> <span class="o">[</span><span class="ss">:created_at</span><span class="p">,</span> <span class="ss">:asc</span><span class="o">]</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-27'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-27">&#182;</a>
+        </div>
+        <p>Returns the modified job</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>      <span class="n">conditions</span><span class="o">[</span><span class="ss">:new</span><span class="o">]</span> <span class="o">=</span> <span class="kp">true</span>
+
+      <span class="kp">new</span> <span class="n">collection</span><span class="o">.</span><span class="n">find_and_modify</span> <span class="n">conditions</span>
+    <span class="k">rescue</span> <span class="no">Mongo</span><span class="o">::</span><span class="no">OperationFailure</span>
+      <span class="kp">nil</span>
+    <span class="k">end</span>
+    </pre></div>
+      </td>
+    </tr>
+    <tr id='section-28'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-28">&#182;</a>
+        </div>
+        <p>Get failed jobs from any <code>opts[:queues]</code></p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">failed</span><span class="p">(</span><span class="n">opts</span><span class="o">=</span><span class="p">{})</span>
+      <span class="n">selector</span> <span class="o">=</span> <span class="p">{}</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-29'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-29">&#182;</a>
+        </div>
+        <p>Failed or dead jobs only</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>      <span class="n">selector</span><span class="o">[</span><span class="s2">&quot;$or&quot;</span><span class="o">]</span> <span class="o">=</span> <span class="o">[</span>
+        <span class="p">{</span><span class="n">failed</span><span class="p">:</span> <span class="kp">true</span><span class="p">},</span> 
+        <span class="p">{</span><span class="s2">&quot;$where&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;this.attempts &gt; this.retries&quot;</span><span class="p">},</span>
+      <span class="o">]</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-30'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-30">&#182;</a>
+        </div>
+        <p>Filter by queue if present</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>      <span class="n">selector</span><span class="o">[</span><span class="ss">:queue</span><span class="o">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;$in&quot;</span> <span class="o">=&gt;</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:queues</span><span class="o">]</span><span class="p">}</span> <span class="k">if</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:queues</span><span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">opts</span><span class="o">[</span><span class="ss">:queues</span><span class="o">].</span><span class="n">empty?</span>
+
+      <span class="n">options</span> <span class="o">=</span> <span class="p">{}</span>
+      <span class="n">options</span><span class="o">[</span><span class="ss">:skip</span><span class="o">]</span> <span class="o">=</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:skip</span><span class="o">]</span> <span class="k">if</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:skip</span><span class="o">]</span>
+      <span class="n">options</span><span class="o">[</span><span class="ss">:limit</span><span class="o">]</span> <span class="o">=</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:limit</span><span class="o">]</span> <span class="k">if</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:limit</span><span class="o">]</span>
+
+      <span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">selector</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span><span class="o">.</span><span class="n">collect</span><span class="p">{</span><span class="o">|</span><span class="n">attrs</span><span class="o">|</span> <span class="kp">new</span> <span class="n">attrs</span><span class="p">}</span>
+    <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-31'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-31">&#182;</a>
         </div>
         <p>Save to queue</p>
       </td>
       <td class=code>
         <div class='highlight'><pre>    <span class="k">def</span> <span class="nf">save</span>
-      <span class="nb">self</span><span class="o">.</span><span class="n">updated_at</span> <span class="o">=</span> <span class="no">Time</span><span class="o">.</span><span class="n">now</span>
+      <span class="nb">self</span><span class="o">.</span><span class="n">updated_at</span> <span class="o">=</span> <span class="no">Time</span><span class="o">.</span><span class="n">now</span><span class="o">.</span><span class="n">utc</span>
       <span class="k">if</span> <span class="n">persisted?</span>
         <span class="k">raise</span> <span class="no">NotImplementedError</span>
       <span class="k">else</span>
         <span class="nb">self</span><span class="o">.</span><span class="n">created_at</span> <span class="o">=</span> <span class="n">updated_at</span>
-        <span class="nb">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">insert</span> <span class="n">attributes</span><span class="p">,</span> <span class="n">safe</span><span class="p">:</span> <span class="kp">true</span>
+        <span class="nb">self</span><span class="o">.</span><span class="n">delayed_until</span> <span class="o">=</span> <span class="o">::</span><span class="no">Time</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="n">created_at</span><span class="o">.</span><span class="n">to_i</span> <span class="o">+</span> <span class="n">delay</span><span class="p">)</span><span class="o">.</span><span class="n">utc</span>
+        <span class="nb">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">insert</span> <span class="n">attributes</span><span class="p">,</span> <span class="n">safe</span><span class="p">:</span> <span class="kp">true</span>
       <span class="k">end</span>
       <span class="kp">true</span>
     <span class="k">rescue</span> <span class="no">Mongo</span><span class="o">::</span><span class="no">OperationFailure</span>
@@ -230,36 +420,44 @@
     <span class="k">end</span>
 
     <span class="k">def</span> <span class="nf">reload</span>
-      <span class="n">doc</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">find_one</span> <span class="nb">id</span>
-      <span class="n">attributes</span><span class="o">.</span><span class="n">each</span><span class="p">{</span><span class="o">|</span><span class="kp">attr</span><span class="p">,</span> <span class="n">_</span><span class="o">|</span> <span class="nb">send</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="kp">attr</span><span class="si">}</span><span class="s2">=&quot;</span><span class="p">,</span> <span class="n">doc</span><span class="o">[</span><span class="kp">attr</span><span class="o">.</span><span class="n">to_s</span><span class="o">]</span><span class="p">}</span>
+      <span class="nb">self</span><span class="o">.</span><span class="n">attributes</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">find_one</span> <span class="n">_id</span>
       <span class="nb">self</span>
     <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-17'>
+    <tr id='section-32'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-17">&#182;</a>
+          <a class="pilcrow" href="#section-32">&#182;</a>
         </div>
         <p>If we have an id the object is persisted</p>
 
       </td>
       <td class=code>
         <div class='highlight'><pre>    <span class="k">def</span> <span class="nf">persisted?</span>
-      <span class="o">!!</span><span class="nb">self</span><span class="o">.</span><span class="n">id</span>
+      <span class="o">!!</span><span class="n">_id</span>
+    <span class="k">end</span>
+    
+    <span class="k">def</span> <span class="nf">==</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+      <span class="n">other</span><span class="o">.</span><span class="n">_id</span> <span class="o">==</span> <span class="n">_id</span>
     <span class="k">end</span>
 
   <span class="kp">private</span>
-    <span class="k">def</span> <span class="nf">collection</span>
-      <span class="vi">@collection</span> <span class="o">||=</span> <span class="no">Cyclop</span><span class="o">.</span><span class="n">db</span> <span class="p">?</span> 
+    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">collection</span>
+      <span class="vc">@@collection</span> <span class="o">||=</span> <span class="no">Cyclop</span><span class="o">.</span><span class="n">db</span> <span class="p">?</span>
         <span class="no">Cyclop</span><span class="o">.</span><span class="n">db</span><span class="o">[</span><span class="s2">&quot;cyclop_jobs&quot;</span><span class="o">]</span> <span class="p">:</span> <span class="k">raise</span><span class="p">(</span><span class="no">Cyclop</span><span class="o">::</span><span class="no">DatabaseNotAvailable</span><span class="p">)</span>
     <span class="k">end</span>
     
+    <span class="k">def</span> <span class="nf">collection</span>
+      <span class="nb">self</span><span class="o">.</span><span class="n">class</span><span class="o">.</span><span class="n">collection</span>
+    <span class="k">end</span>
+
     <span class="k">def</span> <span class="nf">attributes</span>
       <span class="p">{</span>
         <span class="n">queue</span><span class="p">:</span> <span class="n">queue</span><span class="p">,</span>
         <span class="n">job_params</span><span class="p">:</span> <span class="n">job_params</span><span class="p">,</span>
         <span class="n">delay</span><span class="p">:</span> <span class="n">delay</span><span class="p">,</span>
+        <span class="n">delayed_until</span><span class="p">:</span> <span class="n">delayed_until</span><span class="p">,</span>
         <span class="n">retries</span><span class="p">:</span> <span class="n">retries</span><span class="p">,</span>
         <span class="n">splay</span><span class="p">:</span> <span class="n">splay</span><span class="p">,</span>
         <span class="n">created_by</span><span class="p">:</span> <span class="n">created_by</span><span class="p">,</span>
@@ -267,11 +465,24 @@
         <span class="n">updated_at</span><span class="p">:</span> <span class="n">updated_at</span><span class="p">,</span>
         <span class="n">locked_by</span><span class="p">:</span> <span class="n">locked_by</span><span class="p">,</span>
         <span class="n">locked_at</span><span class="p">:</span> <span class="n">locked_at</span><span class="p">,</span>
+        <span class="n">failed</span><span class="p">:</span> <span class="n">failed</span><span class="p">,</span>
         <span class="n">attempts</span><span class="p">:</span> <span class="n">attempts</span><span class="p">,</span>
         <span class="n">errors</span><span class="p">:</span> <span class="n">errors</span><span class="p">,</span>
       <span class="p">}</span>
     <span class="k">end</span>
 
+    <span class="k">def</span> <span class="nf">attributes</span><span class="o">=</span><span class="p">(</span><span class="n">attrs</span><span class="p">)</span>
+      <span class="n">attrs</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+        <span class="nb">send</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">key</span><span class="si">}</span><span class="s2">=&quot;</span><span class="p">,</span> <span class="n">value</span>
+      <span class="k">end</span>
+      <span class="nb">self</span><span class="o">.</span><span class="n">delay</span> <span class="o">||=</span> <span class="mi">0</span>
+      <span class="nb">self</span><span class="o">.</span><span class="n">retries</span> <span class="o">||=</span> <span class="mi">0</span>
+      <span class="nb">self</span><span class="o">.</span><span class="n">splay</span> <span class="o">||=</span> <span class="mi">60</span>
+      <span class="nb">self</span><span class="o">.</span><span class="n">created_by</span> <span class="o">||=</span> <span class="no">Cyclop</span><span class="o">.</span><span class="n">host</span>
+      <span class="nb">self</span><span class="o">.</span><span class="n">failed</span> <span class="o">||=</span> <span class="kp">false</span>
+      <span class="nb">self</span><span class="o">.</span><span class="n">attempts</span> <span class="o">||=</span> <span class="mi">0</span>
+      <span class="nb">self</span><span class="o">.</span><span class="n">errors</span> <span class="o">||=</span> <span class="o">[]</span>
+    <span class="k">end</span>
   <span class="k">end</span>
 <span class="k">end</span></pre></div>
       </td>
