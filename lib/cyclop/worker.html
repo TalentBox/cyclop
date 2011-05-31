@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>worker.rb</title>
+  <link rel="stylesheet" href="http://jashkenas.github.com/docco/resources/docco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div id="jump_to">
+    Jump To &hellip;
+    <div id="jump_wrapper">
+      <div id="jump_page">
+          <a class="source" href="../cyclop.html">cyclop.rb</a>
+          <a class="source" href="job.html">job.rb</a>
+          <a class="source" href="version.html">version.rb</a>
+          <a class="source" href="worker.html">worker.rb</a>
+      </div>
+    </div>
+  </div>
+  <table cellspacing=0 cellpadding=0>
+  <thead>
+    <tr>
+      <th class=docs><h1>worker.rb</h1></th>
+      <th class=code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr id='section-1'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-1">&#182;</a>
+        </div>
+        
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="k">module</span> <span class="nn">Cyclop</span>
+  <span class="k">class</span> <span class="nc">Worker</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-2'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-2">&#182;</a>
+        </div>
+        <p>Queues to process</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:queues</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-3'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-3">&#182;</a>
+        </div>
+        <p>Logger for master</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:logger</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-4'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-4">&#182;</a>
+        </div>
+        <p>How much time to sleep between poll</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="kp">attr_accessor</span> <span class="ss">:sleep_interval</span>
+
+    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{})</span>
+      <span class="nb">self</span><span class="o">.</span><span class="n">queues</span> <span class="o">=</span> <span class="n">config</span><span class="o">[</span><span class="s2">&quot;queues&quot;</span><span class="o">]</span> <span class="o">||</span> <span class="o">[]</span>
+      <span class="nb">self</span><span class="o">.</span><span class="n">sleep_interval</span> <span class="o">=</span> <span class="n">config</span><span class="o">[</span><span class="s2">&quot;sleep_interval&quot;</span><span class="o">]</span> <span class="o">||</span> <span class="o">[]</span>
+      <span class="nb">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="no">Logger</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">config</span><span class="o">[</span><span class="s2">&quot;log_file&quot;</span><span class="o">]</span> <span class="o">||</span> <span class="vg">$stdout</span><span class="p">)</span>
+      <span class="n">connection</span> <span class="o">=</span> <span class="k">if</span> <span class="n">config</span><span class="o">[</span><span class="s2">&quot;mongodb&quot;</span><span class="o">][</span><span class="s2">&quot;hosts&quot;</span><span class="o">]</span>
+        <span class="no">Mongo</span><span class="o">::</span><span class="no">ReplSetConnection</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
+          <span class="o">*</span><span class="n">config</span><span class="o">[</span><span class="s2">&quot;mongodb&quot;</span><span class="o">][</span><span class="s2">&quot;hosts&quot;</span><span class="o">]</span><span class="p">,</span>
+          <span class="n">rs_name</span><span class="p">:</span> <span class="n">config</span><span class="o">[</span><span class="s2">&quot;mongodb&quot;</span><span class="o">][</span><span class="s2">&quot;rs_name&quot;</span><span class="o">]</span><span class="p">,</span>
+          <span class="n">read_secondary</span><span class="p">:</span> <span class="o">!!</span><span class="n">config</span><span class="o">[</span><span class="s2">&quot;mongodb&quot;</span><span class="o">][</span><span class="s2">&quot;read_secondary&quot;</span><span class="o">]</span><span class="p">,</span>
+          <span class="n">logger</span><span class="p">:</span> <span class="p">(</span><span class="n">logger</span> <span class="k">if</span> <span class="n">config</span><span class="o">[</span><span class="s2">&quot;mongodb&quot;</span><span class="o">][</span><span class="s2">&quot;log&quot;</span><span class="o">]</span><span class="p">),</span>
+        <span class="p">)</span>
+      <span class="k">else</span>
+        <span class="no">Mongo</span><span class="o">::</span><span class="no">Connection</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
+          <span class="n">config</span><span class="o">[</span><span class="s2">&quot;mongodb&quot;</span><span class="o">][</span><span class="s2">&quot;host&quot;</span><span class="o">]</span><span class="p">,</span>
+          <span class="n">config</span><span class="o">[</span><span class="s2">&quot;mongodb&quot;</span><span class="o">][</span><span class="s2">&quot;port&quot;</span><span class="o">]</span><span class="p">,</span>
+          <span class="n">logger</span><span class="p">:</span> <span class="p">(</span><span class="n">logger</span> <span class="k">if</span> <span class="n">config</span><span class="o">[</span><span class="s2">&quot;mongodb&quot;</span><span class="o">][</span><span class="s2">&quot;log&quot;</span><span class="o">]</span><span class="p">),</span>
+        <span class="p">)</span>
+      <span class="k">end</span>
+      <span class="no">Cyclop</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">db</span> <span class="n">config</span><span class="o">[</span><span class="s2">&quot;mongo&quot;</span><span class="o">][</span><span class="s2">&quot;database&quot;</span><span class="o">]</span>
+    <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-5'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-5">&#182;</a>
+        </div>
+        <p>Start processing jobs</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="k">def</span> <span class="nf">run</span>
+      <span class="kp">loop</span> <span class="k">do</span>
+        <span class="k">break</span> <span class="k">if</span> <span class="vi">@stop</span>
+        <span class="k">if</span> <span class="n">job</span> <span class="o">=</span> <span class="n">next_job</span>
+          <span class="n">before_fork</span> <span class="n">job</span>
+          <span class="k">if</span> <span class="vi">@pid</span> <span class="o">=</span> <span class="nb">fork</span>
+          <span class="k">else</span>
+          <span class="k">end</span>
+        <span class="k">else</span>
+          <span class="nb">sleep</span> <span class="n">sleep_interval</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+    <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-6'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-6">&#182;</a>
+        </div>
+        <p>Called before forking a new process</p>
+
+<p>This is intended to be overriden</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li>(Cyclop::Job) job &ndash; the job to process</li>
+</ul>
+
+
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="k">def</span> <span class="nf">before_fork</span><span class="p">(</span><span class="n">job</span><span class="p">)</span>
+    <span class="k">end</span>
+
+  <span class="kp">private</span>
+
+    <span class="k">def</span> <span class="nf">next_job</span>
+      <span class="no">Cyclop</span><span class="o">.</span><span class="n">next</span> <span class="n">queues</span>
+    <span class="k">end</span>
+    
+    <span class="k">def</span> <span class="nf">procline</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+      <span class="vg">$0</span> <span class="o">=</span> <span class="s2">&quot;cyclop-</span><span class="si">#{</span><span class="no">Cyclop</span><span class="o">::</span><span class="no">VERSION</span><span class="si">}</span><span class="s2">: </span><span class="si">#{</span><span class="n">line</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+  </table>
+</div>
+</body>
