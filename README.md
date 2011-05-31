@@ -70,17 +70,9 @@ Usage
 
         Cyclop.failed skip: 10, limit: 30
 
-* Get next failed job:
-
-        Cyclop.next_failed
-
-* Get next failed job on specific queues for a specific host:
-
-        Cyclop.next_failed :upload, :convert, host: "tartarus.local"
-
 * Requeue a failed job:
 
-        job = Cyclop.next_failed
+        job = Cyclop.failed.first
         job.requeue!
 
 * Start a worker:

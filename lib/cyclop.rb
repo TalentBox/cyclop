@@ -9,11 +9,12 @@ module Cyclop
   # Raised if db not set or connection error
   class DatabaseNotAvailable < StandardError; end
 
-  # Sets which `Mongo::DB` to use
+  # Set which `Mongo::DB` to use
   def db=(db)
     @db = db
   end
 
+  # Get `Mongo::DB` to use
   def db
     @db
   end
@@ -65,6 +66,8 @@ module Cyclop
   #   * (Integer) :splay (60) - time to wait in `seconds` between retry.
   #   * (String) :host (Cyclop.host) - host under which the `Cyclop::Job` should be added.
   #
+  # Returns a `Cyclop::Job`
+  #
   def push(opts={})
     Cyclop::Job.create opts
   end
@@ -80,35 +83,31 @@ module Cyclop
   #
   #   * (String) :host - limit to `Cyclop::Job`s queued by this host.
   #
+  # Returns a `Cyclop::Job` or `nil` if nothing to process
+  #
   def next(*args)
+    opts = extract_opts! args
+    Cyclop::Job.next({queues: args, locked_by: master_id}.merge opts)
   end
 
   # Get failed `Cyclop::Job`s
   #
   # Parameters:
   #
-  #   * (Hash) opts (defaults to: {}) - a customizable set of options.
-  #
-  # Options Hash (opts):
-  #
-  #   * (Integer) :skip (0) - number of `Cyclop::Job`s to skip.
-  #   * (Integer) :limit (nil) - maximum number of `Cyclop::Job`s to return.
-  #
-  def failed(*args)
-  end
-
-  # Get a failed `Cyclop::Job` to process
-  #
-  # Parameters:
-  #
-  #   * (Symbol, String) args - list of queues to get a `Cyclop::Job` from. Defaults to all.
+  #   * (Symbol, String) queues - list of queues to get a `Cyclop::Job` from. Defaults to all.
   #   * (Hash) opts (defaults to: {}) - a customizable set of options.
   #
   # Options Hash (opts):
   #
   #   * (String) :host - limit to `Cyclop::Job`s queued by this host.
+  #   * (Integer) :skip (0) - number of `Cyclop::Job`s to skip.
+  #   * (Integer) :limit (nil) - maximum number of `Cyclop::Job`s to return.
   #
-  def next_failed(*args)
+  # Returns an `Array` of failed `Cyclop::Job`
+  #
+  def failed(*args)
+    opts = extract_opts! args
+    Cyclop::Job.failed({queues: args}.merge opts)
   end
 
   # Spawn a `Cyclop::Worker`
@@ -123,5 +122,16 @@ module Cyclop
   #   * (String) :host - limit to `Cyclop::Job`s queued by this host.
   #
   def spawn(*args)
+  end
+
+  # Get a unique identifier for current process
+  def master_id
+    @master_id ||= "#{host}-#{Process.pid}-#{Thread.current}"
+  end
+  
+private
+
+  def extract_opts!(args)
+    (args.pop if args.last.is_a?(Hash)) || {}
   end
 end
