@@ -77,11 +77,7 @@ Usage
 
 * Start a worker:
 
-        Cyclop.spawn
-
-* Start a worker dedicated to specific queues:
-
-        Cyclop.spawn :upload, :convert
+        cyclop -c config.yml
 
 About
 -----

@@ -1,7 +1,10 @@
 require "mongo"
-
+require "logger"
 require "socket"
+
 require "cyclop/job"
+require "cyclop/worker"
+require "cyclop/version"
 
 module Cyclop
   extend self
@@ -22,6 +25,11 @@ module Cyclop
   # Get memoized host
   def host
     @host ||= Socket.gethostname
+  end
+
+  # Get a unique identifier for current process
+  def master_id
+    @master_id ||= "#{host}-#{Process.pid}-#{Thread.current}"
   end
 
   # Queues a new job
@@ -110,25 +118,6 @@ module Cyclop
     Cyclop::Job.failed({queues: args}.merge opts)
   end
 
-  # Spawn a `Cyclop::Worker`
-  #
-  # Parameters:
-  #
-  #   * (Symbol, String) args - list of queues to get `Cyclop::Job` from. Defaults to all.
-  #   * (Hash) opts (defaults to: {}) - a customizable set of options.
-  #
-  # Options Hash (opts):
-  #
-  #   * (String) :host - limit to `Cyclop::Job`s queued by this host.
-  #
-  def spawn(*args)
-  end
-
-  # Get a unique identifier for current process
-  def master_id
-    @master_id ||= "#{host}-#{Process.pid}-#{Thread.current}"
-  end
-  
 private
 
   def extract_opts!(args)

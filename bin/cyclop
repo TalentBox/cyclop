@@ -1,0 +1,66 @@
+#!/usr/bin/env ruby
+
+require "optparse"
+require "cyclop"
+
+options = {}
+opts = OptionParser.new do |opts|
+  opts.banner = "Usage: cyclop [options]"
+  opts.on("-c", "--config CONFIG", "Read config from CONFIG file") do |c|
+    options[:config] = c
+  end
+  opts.on("-h", "--help", "Display more help") do |h|
+    options[:help] = h
+  end
+  opts.on("-V", "--version", "Display version") do |v|
+    puts Cyclop::VERSION
+    exit
+  end
+end
+opts.parse!
+
+if options[:config] && !options[:help]
+  unless File.exists?(options[:config]) && File.readable?(options[:config])
+    puts "Config file '#{options[:config]}' do not exists or is not readable."
+    exit(1)
+  end
+
+  config = nil
+  begin
+    config = YAML::load File.read options[:config]
+  rescue ArgumentError
+  end
+  unless config
+    puts "Config file '#{options[:config]}' format is invalid."
+    exit(1)
+  end
+
+  master = Cyclop::Worker.new config
+  master.run
+else
+  puts opts
+  if options[:help]
+    puts <<-EOS
+
+    Example YAML config file:
+    
+      queues: [
+        "email", "cache"
+      ]
+      sleep_interval: 0.5 # in seconds
+      log_file: "/var/log/cyclop.log"
+      mongo:
+        database: "cyclop"
+        log: true
+        # With replica sets
+        hosts: [
+          ["127.0.0.1", 27017], ["10.0.0.2", 27017]
+        ]
+        rs_name: "production"
+        read_secondary: true
+        # Without replica sets
+        host: "127.0.0.1"
+        port: 27017
+    EOS
+  end
+end
