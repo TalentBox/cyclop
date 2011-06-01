@@ -183,7 +183,7 @@ describe Cyclop::Job do
         end
       end
       context "when locked by the same process and more retries to do" do
-        let(:email_job) { Cyclop::Job.create queue: "email", locked_by: Cyclop.master_id, locked_at: ::Time.at(Time.now.to_i).utc, attempts: 1, retries: 2, splay: 1 }
+        let(:email_job) { Cyclop::Job.create queue: "email", locked_by: Cyclop.master_id, locked_at: ::Time.at(Time.now.to_i).utc, attempts: 1, retries: 1, splay: 1 }
         before :all do
           email_job.release!
           @reload = Cyclop::Job.find email_job._id

@@ -35,7 +35,7 @@ module Cyclop
 
     # Start processing jobs
     def run
-      trap("SIGINT") { @stop = true }
+      register_signal_handlers
       loop do
         if @stop
           log "Shutting down..."
@@ -43,14 +43,20 @@ module Cyclop
         end
         if job = next_job
           @sleeping = false
-          before_fork job
           if @pid = fork
-            log "Forked process #{@pid} to work on job #{job._id}..."
+            msg = "Forked process #{@pid} to work on job #{job.queue}-#{job._id}..."
+            log msg
+            procline msg
             Process.wait
             log "Child process #{@pid} ended with status: #{$?}"
-            after_fork job, $?.exitstatus
+            if $?.exitstatus==0
+              job.complete!
+            else
+              job.release!
+            end
           else
-            exit perform job
+            procline "Processing #{job.queue}-#{job._id} (started at #{Time.now.utc})"
+            exit! perform job
           end
         else
           log "No more job to process, start sleeping..." unless @sleeping
@@ -60,20 +66,7 @@ module Cyclop
       end
     end
 
-    # Called before forking a new process
-    #
-    # This is intended to be overriden
-    #
-    # Parameters:
-    #
-    # * (Cyclop::Job) job - the job to process
-    #
-    def before_fork(job)
-    end
-
     # Called inside forked process
-    #
-    # This is intended to be overriden
     #
     # Parameters:
     #
@@ -81,33 +74,40 @@ module Cyclop
     #
     def perform(job)
       load_actions
-      log job.inspect
       Cyclop::Action.find_by_queue(job.queue).perform(*job.job_params)
       0
-    rescue Exception
-      log $!.to_s
-      job.release! $!
+    rescue Exception => e
+      log e.to_s
+      job.release! e
       1
     end
 
-    # Called after forked process has exited
-    #
-    # This is intended to be overriden
-    #
-    # Parameters:
-    #
-    # * (Cyclop::Job) job - the job to process
-    # * (Integer) status - forked process exit status
-    #
-    def after_fork(job, status)
-      if status==0
-        job.complete!
-      else
-        job.release!
+    # Gracefull shutdown
+    def stop
+      @stop = true
+    end
+
+    # Forced shutdown
+    def stop!
+      if @pid
+        Process.kill "TERM", @pid
+        Process.wait
       end
+      exit!
     end
 
   private
+
+    # Trap signals
+    #
+    # QUIT - graceful shutdown
+    # INT - first gracefull shutdown, second time force shutdown
+    # TERM - force shutdown
+    def register_signal_handlers
+      trap("QUIT") { stop }
+      trap("INT")  { @stop ? stop! : stop }
+      trap("TERM") { stop! }
+    end
 
     def next_job
       Cyclop.next *queues
@@ -120,7 +120,7 @@ module Cyclop
     def log(message)
       logger << "#{Time.now}: #{message}\n"
     end
-    
+
     def load_actions
       Dir["#{actions}/*.rb"].each{|action| require action}
     end

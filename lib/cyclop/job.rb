@@ -147,7 +147,7 @@ module Cyclop
     def release!(exception = nil)
       now = ::Time.at(Time.now.to_i).utc
       selector = {_id: _id, locked_by: Cyclop.master_id}
-      set = if attempts<retries
+      set = if attempts<=retries
         {locked_by: nil, locked_at: nil, delayed_until: now+splay}
       else
         {failed: true}
