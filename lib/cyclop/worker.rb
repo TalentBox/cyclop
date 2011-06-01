@@ -9,7 +9,7 @@ module Cyclop
 
     def initialize(config={})
       self.queues = config["queues"] || []
-      self.sleep_interval = config["sleep_interval"] || []
+      self.sleep_interval = config["sleep_interval"] || 1
       self.logger = Logger.new(config["log_file"] || $stdout)
       connection = if config["mongodb"]["hosts"]
         Mongo::ReplSetConnection.new(
@@ -30,12 +30,18 @@ module Cyclop
 
     # Start processing jobs
     def run
+      trap("SIGINT") { @stop = true }
       loop do
         break if @stop
         if job = next_job
           before_fork job
           if @pid = fork
+            logger << "#{Time.now}: Forked process #{@pid} to work on job #{job.id}..."
+            Process.wait
+            logger << "#{Time.now}: Child process #{@pid} ended with status: #{$?.exitstatus}"
+            after_fork job, $?.exitstatus
           else
+            exit perform job
           end
         else
           sleep sleep_interval
@@ -52,6 +58,29 @@ module Cyclop
     # * (Cyclop::Job) job - the job to process
     #
     def before_fork(job)
+    end
+    
+    # Called inside forked process
+    #
+    # This is intended to be overriden
+    #
+    # Parameters:
+    #
+    # * (Cyclop::Job) job - the job to process
+    #
+    def perform(job)
+    end
+    
+    # Called after forked process has exited
+    #
+    # This is intended to be overriden
+    #
+    # Parameters:
+    #
+    # * (Cyclop::Job) job - the job to process
+    # * (Integer) status - forked process exit status
+    #
+    def after_fork(job, status)
     end
 
   private
