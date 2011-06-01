@@ -102,6 +102,12 @@ module Cyclop
 
       collection.find(selector, options).collect{|attrs| new attrs}
     end
+    
+    def self.find(id)
+      if doc = collection.find_one(id)
+        new doc
+      end
+    end
 
     # Save to queue
     def save
@@ -130,6 +136,34 @@ module Cyclop
     
     def ==(other)
       other._id == _id
+    end
+    
+    # Remove successfully processed job from the queue
+    def complete!
+      collection.remove _id: _id, locked_by: Cyclop.master_id
+    end
+
+    # Release job for further processing
+    def release!(exception = nil)
+      now = ::Time.at(Time.now.to_i).utc
+      selector = {_id: _id, locked_by: Cyclop.master_id}
+      set = if attempts<retries
+        {locked_by: nil, locked_at: nil, delayed_until: now+splay}
+      else
+        {failed: true}
+      end
+      update = {"$set" => set}
+      update["$push"] = {
+        :errors => {
+          :locked_by => locked_by,
+          :locked_at => locked_at,
+          :class => exception.class.name,
+          :message => exception.message,
+          :backtrace => exception.backtrace,
+          :created_at => now,
+        },
+      } if exception
+      collection.update selector, update, :safe => true
     end
 
   private

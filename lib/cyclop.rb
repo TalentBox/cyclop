@@ -4,6 +4,7 @@ require "socket"
 
 require "cyclop/job"
 require "cyclop/worker"
+require "cyclop/action"
 require "cyclop/version"
 
 module Cyclop
@@ -11,6 +12,10 @@ module Cyclop
 
   # Raised if db not set or connection error
   class DatabaseNotAvailable < StandardError; end
+  # Raised if two actions share the same queue
+  class ActionQueueClash < StandardError; end
+  # Raised if no action has been found
+  class NoActionFound < StandardError; end
 
   # Set which `Mongo::DB` to use
   def db=(db)

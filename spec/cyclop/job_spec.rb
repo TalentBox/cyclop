@@ -50,7 +50,7 @@ describe Cyclop::Job do
     end
   end
 
-  describe "next(opts={})" do
+  describe ".next(opts={})" do
     it do
       lambda {
         Cyclop::Job.next
@@ -112,7 +112,7 @@ describe Cyclop::Job do
       end
     end
   end
-  describe "failed(opts={})" do
+  describe ".failed(opts={})" do
     context "with no job in queue" do
       it "returns an empty array" do
         Cyclop::Job.failed.should == []
@@ -145,6 +145,131 @@ describe Cyclop::Job do
 
       it "respect :skip and :limit options" do
         Cyclop::Job.failed(skip: 1, limit: 1).should == [cache_job_no_retry]
+      end
+    end
+  end
+  describe "#complete!" do
+    context "when locked by the same process" do
+      let(:email_job) { Cyclop::Job.create queue: "email", locked_by: Cyclop.master_id, locked_at: Time.now.utc }
+      it "removes the job" do
+        email_job.complete!
+        Cyclop::Job.find(email_job._id).should be_nil
+      end
+    end
+    context "when locked by another process" do
+      let(:email_job) { Cyclop::Job.create queue: "email", locked_by: "anotherid", locked_at: Time.now.utc }
+      it "keeps the job" do
+        email_job.complete!
+        Cyclop::Job.find(email_job._id).should == email_job
+      end
+    end
+  end
+  describe "#release!" do
+    context "without exception" do
+      context "when locked by the same process and no more retries to do" do
+        let(:email_job) { Cyclop::Job.create queue: "email", locked_by: Cyclop.master_id, locked_at: ::Time.at(Time.now.to_i).utc, attempts: 1 }
+        before :all do
+          email_job.release!
+          @reload = Cyclop::Job.find email_job._id
+        end
+        it "marks it as failed" do
+          @reload.failed.should be_true
+        end
+        it "keeps locked_at" do
+          @reload.locked_at.should == email_job.locked_at
+        end
+        it "keeps locked_by" do
+          @reload.locked_by.should == email_job.locked_by
+        end
+      end
+      context "when locked by the same process and more retries to do" do
+        let(:email_job) { Cyclop::Job.create queue: "email", locked_by: Cyclop.master_id, locked_at: ::Time.at(Time.now.to_i).utc, attempts: 1, retries: 2, splay: 1 }
+        before :all do
+          email_job.release!
+          @reload = Cyclop::Job.find email_job._id
+        end
+        it "marks it as failed" do
+          @reload.failed.should be_false
+        end
+        it "clears locked_at" do
+          @reload.locked_at.should be_nil
+        end
+        it "clears locked_by" do
+          @reload.locked_by.should be_nil
+        end
+        it "sets delayed_until based on splay" do
+          @reload.delayed_until.should == email_job.locked_at+1
+        end
+      end
+      context "when locked by another process and no more retries to do" do
+        let(:email_job) { Cyclop::Job.create queue: "email", locked_by: "anotherid", locked_at: Time.now.utc, attempts: 1 }
+        it "doesn't mark it as failed" do
+          email_job.release!
+          Cyclop::Job.find(email_job._id).failed.should be_false
+        end
+      end
+    end
+    context "with exception" do
+      let(:exception) { mock :class => Exception, :message => "Soft fail", :backtrace => "backtrace" }
+      before do
+        email_job.release! exception
+        @reload = Cyclop::Job.find email_job._id
+      end
+      context "when locked by the same process and no more retries to do" do
+        let(:email_job) { Cyclop::Job.create queue: "email", locked_by: Cyclop.master_id, locked_at: ::Time.at(Time.now.to_i).utc, attempts: 1 }
+        it "marks it as failed" do
+          @reload.failed.should be_true
+        end
+        it "keeps locked_at" do
+          @reload.locked_at.should == email_job.locked_at
+        end
+        it "keeps locked_by" do
+          @reload.locked_by.should == email_job.locked_by
+        end
+        it "has recorded the error" do
+          @reload.errors.should have(1).item
+          error = @reload.errors.first
+          error["locked_by"].should == email_job.locked_by
+          error["locked_at"].should == email_job.locked_at
+          error["class"].should == "Exception"
+          error["message"].should == "Soft fail"
+          error["backtrace"].should == "backtrace"
+          error["created_at"].should_not be_nil
+        end
+      end
+      context "when locked by the same process and more retries to do" do
+        let(:email_job) { Cyclop::Job.create queue: "email", locked_by: Cyclop.master_id, locked_at: ::Time.at(Time.now.to_i).utc, attempts: 1, retries: 2, splay: 1 }
+        it "marks it as failed" do
+          @reload.failed.should be_false
+        end
+        it "clears locked_at" do
+          @reload.locked_at.should be_nil
+        end
+        it "clears locked_by" do
+          @reload.locked_by.should be_nil
+        end
+        it "sets delayed_until based on splay" do
+          @reload.delayed_until.should == email_job.locked_at+1
+        end
+        it "has recorded the error" do
+          @reload.errors.should have(1).item
+          error = @reload.errors.first
+          error["locked_by"].should == email_job.locked_by
+          error["locked_at"].should == email_job.locked_at
+          error["class"].should == "Exception"
+          error["message"].should == "Soft fail"
+          error["backtrace"].should == "backtrace"
+          error["created_at"].should_not be_nil
+        end
+      end
+      context "when locked by another process and no more retries to do" do
+        let(:email_job) { Cyclop::Job.create queue: "email", locked_by: "anotherid", locked_at: Time.now.utc, attempts: 1 }
+        it "doesn't mark it as failed" do
+          @reload.failed.should be_false
+        end
+        it "doesn't add error" do
+          @reload.errors.should be_empty
+        end
       end
     end
   end

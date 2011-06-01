@@ -34,9 +34,14 @@ if options[:config] && !options[:help]
     puts "Config file '#{options[:config]}' format is invalid."
     exit(1)
   end
-
-  master = Cyclop::Worker.new config
-  master.run
+  
+  begin
+    master = Cyclop::Worker.new config
+  rescue ArgumentError
+    puts $!.message
+  else
+    master.run
+  end
 else
   puts opts
   if options[:help]
@@ -53,6 +58,8 @@ else
       queues: [
         "email", "cache"
       ]
+      # Load actions in this directory (default to ./actions)
+      actions: "/app/actions"
       sleep_interval: 0.5 # in seconds
       log_file: "/var/log/cyclop.log" # will log to STDOUT if missing
       mongo:
