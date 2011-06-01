@@ -13,8 +13,10 @@
     <div id="jump_wrapper">
       <div id="jump_page">
           <a class="source" href="../cyclop.html">cyclop.rb</a>
+          <a class="source" href="action.html">action.rb</a>
           <a class="source" href="job.html">job.rb</a>
           <a class="source" href="version.html">version.rb</a>
+          <a class="source" href="worker.html">worker.rb</a>
       </div>
     </div>
   </div>
@@ -394,6 +396,12 @@
       <span class="n">options</span><span class="o">[</span><span class="ss">:limit</span><span class="o">]</span> <span class="o">=</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:limit</span><span class="o">]</span> <span class="k">if</span> <span class="n">opts</span><span class="o">[</span><span class="ss">:limit</span><span class="o">]</span>
 
       <span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">selector</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span><span class="o">.</span><span class="n">collect</span><span class="p">{</span><span class="o">|</span><span class="n">attrs</span><span class="o">|</span> <span class="kp">new</span> <span class="n">attrs</span><span class="p">}</span>
+    <span class="k">end</span>
+    
+    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">find</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">doc</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">find_one</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+        <span class="kp">new</span> <span class="n">doc</span>
+      <span class="k">end</span>
     <span class="k">end</span></pre></div>
       </td>
     </tr>
@@ -431,7 +439,6 @@
           <a class="pilcrow" href="#section-32">&#182;</a>
         </div>
         <p>If we have an id the object is persisted</p>
-
       </td>
       <td class=code>
         <div class='highlight'><pre>    <span class="k">def</span> <span class="nf">persisted?</span>
@@ -440,6 +447,52 @@
     
     <span class="k">def</span> <span class="nf">==</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
       <span class="n">other</span><span class="o">.</span><span class="n">_id</span> <span class="o">==</span> <span class="n">_id</span>
+    <span class="k">end</span>
+    </pre></div>
+      </td>
+    </tr>
+    <tr id='section-33'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-33">&#182;</a>
+        </div>
+        <p>Remove successfully processed job from the queue</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="k">def</span> <span class="nf">complete!</span>
+      <span class="n">collection</span><span class="o">.</span><span class="n">remove</span> <span class="n">_id</span><span class="p">:</span> <span class="n">_id</span><span class="p">,</span> <span class="n">locked_by</span><span class="p">:</span> <span class="no">Cyclop</span><span class="o">.</span><span class="n">master_id</span>
+    <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-34'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-34">&#182;</a>
+        </div>
+        <p>Release job for further processing</p>
+
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="k">def</span> <span class="nf">release!</span><span class="p">(</span><span class="n">exception</span> <span class="o">=</span> <span class="kp">nil</span><span class="p">)</span>
+      <span class="n">now</span> <span class="o">=</span> <span class="o">::</span><span class="no">Time</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="no">Time</span><span class="o">.</span><span class="n">now</span><span class="o">.</span><span class="n">to_i</span><span class="p">)</span><span class="o">.</span><span class="n">utc</span>
+      <span class="n">selector</span> <span class="o">=</span> <span class="p">{</span><span class="n">_id</span><span class="p">:</span> <span class="n">_id</span><span class="p">,</span> <span class="n">locked_by</span><span class="p">:</span> <span class="no">Cyclop</span><span class="o">.</span><span class="n">master_id</span><span class="p">}</span>
+      <span class="n">set</span> <span class="o">=</span> <span class="k">if</span> <span class="n">attempts</span><span class="o">&lt;=</span><span class="n">retries</span>
+        <span class="p">{</span><span class="n">locked_by</span><span class="p">:</span> <span class="kp">nil</span><span class="p">,</span> <span class="n">locked_at</span><span class="p">:</span> <span class="kp">nil</span><span class="p">,</span> <span class="n">delayed_until</span><span class="p">:</span> <span class="n">now</span><span class="o">+</span><span class="n">splay</span><span class="p">}</span>
+      <span class="k">else</span>
+        <span class="p">{</span><span class="n">failed</span><span class="p">:</span> <span class="kp">true</span><span class="p">}</span>
+      <span class="k">end</span>
+      <span class="n">update</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;$set&quot;</span> <span class="o">=&gt;</span> <span class="n">set</span><span class="p">}</span>
+      <span class="n">update</span><span class="o">[</span><span class="s2">&quot;$push&quot;</span><span class="o">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="ss">:errors</span> <span class="o">=&gt;</span> <span class="p">{</span>
+          <span class="ss">:locked_by</span> <span class="o">=&gt;</span> <span class="n">locked_by</span><span class="p">,</span>
+          <span class="ss">:locked_at</span> <span class="o">=&gt;</span> <span class="n">locked_at</span><span class="p">,</span>
+          <span class="ss">:class</span> <span class="o">=&gt;</span> <span class="n">exception</span><span class="o">.</span><span class="n">class</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+          <span class="ss">:message</span> <span class="o">=&gt;</span> <span class="n">exception</span><span class="o">.</span><span class="n">message</span><span class="p">,</span>
+          <span class="ss">:backtrace</span> <span class="o">=&gt;</span> <span class="n">exception</span><span class="o">.</span><span class="n">backtrace</span><span class="p">,</span>
+          <span class="ss">:created_at</span> <span class="o">=&gt;</span> <span class="n">now</span><span class="p">,</span>
+        <span class="p">},</span>
+      <span class="p">}</span> <span class="k">if</span> <span class="n">exception</span>
+      <span class="n">collection</span><span class="o">.</span><span class="n">update</span> <span class="n">selector</span><span class="p">,</span> <span class="n">update</span><span class="p">,</span> <span class="ss">:safe</span> <span class="o">=&gt;</span> <span class="kp">true</span>
     <span class="k">end</span>
 
   <span class="kp">private</span>
