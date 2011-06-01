@@ -44,23 +44,26 @@ else
 
     Example YAML config file:
     
+      # Optional: only process jobs from the specified queues
       queues: [
         "email", "cache"
       ]
       sleep_interval: 0.5 # in seconds
-      log_file: "/var/log/cyclop.log"
+      log_file: "/var/log/cyclop.log" # will log to STDOUT if missing
       mongo:
         database: "cyclop"
-        log: true
-        # With replica sets
-        hosts: [
-          ["127.0.0.1", 27017], ["10.0.0.2", 27017]
-        ]
-        rs_name: "production"
-        read_secondary: true
+        log: true # for debug only
+
         # Without replica sets
-        host: "127.0.0.1"
-        port: 27017
+        host: "127.0.0.1" # will default to "127.0.0.1"
+        port: 27017 # will default to 27017
+
+        # Uncomment the following lines if you use a replica set
+        # hosts: [
+        #   ["127.0.0.1", 27017], ["10.0.0.2", 27017]
+        # ]
+        # rs_name: "production"
+        # read_secondary: true
     EOS
   end
 end

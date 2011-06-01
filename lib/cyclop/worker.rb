@@ -11,18 +11,18 @@ module Cyclop
       self.queues = config["queues"] || []
       self.sleep_interval = config["sleep_interval"] || 1
       self.logger = Logger.new(config["log_file"] || $stdout)
-      connection = if config["mongodb"]["hosts"]
+      connection = if config["mongo"]["hosts"]
         Mongo::ReplSetConnection.new(
-          *config["mongodb"]["hosts"],
-          rs_name: config["mongodb"]["rs_name"],
-          read_secondary: !!config["mongodb"]["read_secondary"],
-          logger: (logger if config["mongodb"]["log"]),
+          *config["mongo"]["hosts"],
+          rs_name: config["mongo"]["rs_name"],
+          read_secondary: !!config["mongo"]["read_secondary"],
+          logger: (logger if config["mongo"]["log"]),
         )
       else
         Mongo::Connection.new(
-          config["mongodb"]["host"],
-          config["mongodb"]["port"],
-          logger: (logger if config["mongodb"]["log"]),
+          (config["mongo"]["host"] || "127.0.0.1"),
+          (config["mongo"]["port"] || 27017),
+          logger: (logger if config["mongo"]["log"]),
         )
       end
       Cyclop.db = connection.db config["mongo"]["database"]
@@ -32,18 +32,24 @@ module Cyclop
     def run
       trap("SIGINT") { @stop = true }
       loop do
-        break if @stop
+        if @stop
+          log "Shutting down..."
+          break
+        end
         if job = next_job
+          @sleeping = false
           before_fork job
           if @pid = fork
-            logger << "#{Time.now}: Forked process #{@pid} to work on job #{job.id}..."
+            log "Forked process #{@pid} to work on job #{job.id}..."
             Process.wait
-            logger << "#{Time.now}: Child process #{@pid} ended with status: #{$?.exitstatus}"
+            log "Child process #{@pid} ended with status: #{$?.exitstatus}"
             after_fork job, $?.exitstatus
           else
             exit perform job
           end
         else
+          log "No more job to process, start sleeping..." unless @sleeping
+          @sleeping = true
           sleep sleep_interval
         end
       end
@@ -91,6 +97,10 @@ module Cyclop
     
     def procline(line)
       $0 = "cyclop-#{Cyclop::VERSION}: #{line}"
+    end
+    
+    def log(message)
+      logger << "#{Time.now}: #{message}\n"
     end
   end
 end
