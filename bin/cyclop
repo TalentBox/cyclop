@@ -42,7 +42,12 @@ else
   if options[:help]
     puts <<-EOS
 
-    Example YAML config file:
+    Minimal valid YAML config file:
+
+      mongo:
+        database: "cyclop"
+
+    Example YAML config file with more options:
     
       # Optional: only process jobs from the specified queues
       queues: [
