@@ -33,9 +33,6 @@ describe Cyclop::Job do
         subject.reload.queue.should == "demo"
       end
     end
-    context "on update" do
-      pending
-    end
   end
 
   describe ".create(opts={})" do
