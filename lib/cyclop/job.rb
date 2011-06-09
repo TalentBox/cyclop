@@ -165,6 +165,12 @@ module Cyclop
       } if exception
       collection.update selector, update, :safe => true
     end
+    
+    def requeue
+      self.attempts, self.failed, self.locked_at = 0, false, nil
+      update = {attempts: attempts, failed: failed, locked_at: locked_at}
+      collection.update({_id: _id}, {"$set" => update}, :safe => true)
+    end
 
   private
     def self.collection

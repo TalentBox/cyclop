@@ -73,7 +73,7 @@ Usage
 * Requeue a failed job:
 
         job = Cyclop.failed.first
-        job.requeue!
+        job.requeue
 
 * Start a worker:
 

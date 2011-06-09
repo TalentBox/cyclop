@@ -270,4 +270,31 @@ describe Cyclop::Job do
       end
     end
   end
+  describe "#requeue" do
+    let(:email_job_failed) { Cyclop::Job.create queue: "email", :locked_by => "anotherid", :locked_at => Time.now.utc, attempts: 1, failed: true }
+
+    it "can't be taken before requeue" do
+      Cyclop::Job.next(locked_by: "myid").should be_nil
+    end
+
+    it "resets failed to false" do
+      email_job_failed.requeue
+      email_job_failed.failed.should be_false
+    end
+
+    it "resets attemps to 0" do
+      email_job_failed.requeue
+      email_job_failed.attempts.should == 0
+    end
+
+    it "resets locked_at to nil" do
+      email_job_failed.requeue
+      email_job_failed.locked_at.should == nil
+    end
+
+    it "can be taken again after requeue" do
+      email_job_failed.requeue
+      Cyclop::Job.next(locked_by: "myid").should == email_job_failed
+    end
+  end
 end
