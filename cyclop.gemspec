@@ -12,8 +12,6 @@ Gem::Specification.new do |s|
   s.summary     = "Job queue with MongoDB"
   s.description = "Job queue with MongoDB with emphasis on never losing any task even if worker fails hard (segfault)."
 
-  s.rubyforge_project = "cyclop"
-
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
