@@ -78,6 +78,10 @@ Usage
 * Start a worker:
 
         cyclop -c config.yml
+        
+* To get help about the format for config.yml
+
+        cyclop -h
 
 About
 -----

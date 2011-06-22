@@ -58,6 +58,9 @@ else
       queues: [
         "email", "cache"
       ]
+      # Limit this worker to job queued by this host
+      # use "localhost" to let Cyclop set it to the host running the worker
+      limit_to_host: "server1.mydomain.tld"
       # Load actions in this directory (default to ./actions)
       actions: "/app/actions"
       sleep_interval: 0.5 # in seconds

@@ -82,6 +82,7 @@ module Cyclop
   # Returns a `Cyclop::Job`
   #
   def push(opts={})
+    opts["created_by"] = opts.delete :host
     Cyclop::Job.create opts
   end
 

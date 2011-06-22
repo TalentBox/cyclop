@@ -8,6 +8,8 @@ module Cyclop
     attr_accessor :sleep_interval
     # Path to actions directory
     attr_accessor :actions
+    # Options passed to Cyclop.next to get next job
+    attr_accessor :job_opts
 
     def initialize(config={})
       raise ArgumentError, 'mongo["database"] is required' unless config["mongo"] && config["mongo"]["database"]
@@ -16,6 +18,11 @@ module Cyclop
       self.logger = Logger.new(config["log_file"] || $stdout)
       self.sleep_interval = config["sleep_interval"] || 1
       self.actions = config["actions"] || "./actions"
+      @job_opts = {}
+      if config["limit_to_host"]
+        @job_opts[:host] = config["limit_to_host"]
+        @job_opts[:host] = Cyclop.host if @job_opts[:host]=="localhost"
+      end
       connection = if config["mongo"]["hosts"]
         Mongo::ReplSetConnection.new(
           *config["mongo"]["hosts"],
@@ -110,7 +117,7 @@ module Cyclop
     end
 
     def next_job
-      Cyclop.next *queues
+      Cyclop.next *queues, job_opts
     end
 
     def procline(line)

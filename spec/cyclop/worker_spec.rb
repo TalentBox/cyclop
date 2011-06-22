@@ -74,5 +74,30 @@ describe Cyclop::Worker do
         job.attempts.should == 2
       end
     end
+    
+    context "limiting to jobs queued by a given host" do
+      let(:host) { "test.local" }
+      let(:worker) do
+        Cyclop::Worker.new({
+          "log_file" => File.expand_path("../../../test.log", __FILE__),
+          "mongo" => {"database" => "cyclop_test"},
+          "actions" => File.expand_path("../../fixtures/actions", __FILE__),
+          "limit_to_host" => host,
+        }) 
+      end
+      it "run only jobs from this host" do
+        job = Cyclop.push queue: "slow", job_params: ["tony@starkenterprises.com", :welcome]
+        job_local = Cyclop.push queue: "slow", job_params: ["tony@starkenterprises.com", :welcome], host: host
+        2.times do
+          t = Thread.new { worker.run }
+          sleep 1
+          worker.stop
+          t.join
+        end
+        job.reload
+        job.attempts.should == 0
+        Cyclop::Job.find(job_local._id).should be_nil
+      end
+    end
   end
 end
