@@ -136,7 +136,7 @@ module Cyclop
     end
 
     def load_actions
-      Dir["#{actions}/*.rb"].each{|action| require action}
+      Dir["#{actions}/*.rb"].each{|action| require File.absolute_path(action) }
     end
 
     def stop?
