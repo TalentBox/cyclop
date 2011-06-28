@@ -8,6 +8,10 @@ module Cyclop
     attr_accessor :sleep_interval
     # Path to actions directory
     attr_accessor :actions
+    # Number of jobs to process before exiting
+    attr_accessor :die_after
+    # Number of jobs processed by this worker
+    attr_accessor :processed_jobs
     # Options passed to Cyclop.next to get next job
     attr_accessor :job_opts
 
@@ -18,6 +22,8 @@ module Cyclop
       self.logger = Logger.new(config["log_file"] || $stdout)
       self.sleep_interval = config["sleep_interval"] || 1
       self.actions = config["actions"] || "./actions"
+      self.processed_jobs = 0
+      self.die_after = config["die_after"]
       @job_opts = {}
       if config["limit_to_host"]
         @job_opts[:host] = config["limit_to_host"]
@@ -44,7 +50,7 @@ module Cyclop
     def run
       register_signal_handlers
       loop do
-        if @stop
+        if stop?
           log "Shutting down..."
           break
         end
@@ -56,6 +62,7 @@ module Cyclop
             procline msg
             Process.wait
             log "Child process #{@pid} ended with status: #{$?}"
+            self.processed_jobs += 1
             if $?.exitstatus==0
               job.complete!
             else
@@ -130,6 +137,10 @@ module Cyclop
 
     def load_actions
       Dir["#{actions}/*.rb"].each{|action| require action}
+    end
+
+    def stop?
+      @stop || (die_after && processed_jobs >= die_after.to_i)
     end
   end
 end

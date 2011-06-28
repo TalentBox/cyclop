@@ -61,6 +61,10 @@ else
       # Limit this worker to job queued by this host
       # use "localhost" to let Cyclop set it to the host running the worker
       limit_to_host: "server1.mydomain.tld"
+      # Exit worker after having processed x jobs
+      # nil : no limit
+      # [1-9]+: limit to this number
+      die_after: 100
       # Load actions in this directory (default to ./actions)
       actions: "/app/actions"
       sleep_interval: 0.5 # in seconds
