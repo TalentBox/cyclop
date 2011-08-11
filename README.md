@@ -3,6 +3,11 @@ Cyclop
 
 Job queue with MongoDB with emphasis on never losing any task even if worker fails hard (segfault).
 
+Build Status
+---------
+
+[![Build Status](http://travis-ci.org/TalentBox/cyclop.png)](http://travis-ci.org/TalentBox/cyclop)
+
 Dependencies
 ------------
 
