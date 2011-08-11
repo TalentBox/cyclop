@@ -4,3 +4,5 @@ rvm:
   - ruby-head
 env:
   - JRUBY_OPTS='--1.9'
+notifications:
+  disabled: true
