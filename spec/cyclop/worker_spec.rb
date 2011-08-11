@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe Cyclop::Worker do
-  subject { Cyclop::Worker.new({"mongo" => {"database" => "cyclop_test"}}) }
+  subject { Cyclop::Worker.new({"mongo" => {"database" => Cyclop.db.name}}) }
 
   its(:queues){ should be_empty }
   its(:logger){ should_not be_nil }
@@ -18,7 +18,7 @@ describe Cyclop::Worker do
   describe "#perform" do
     let(:worker) do
       Cyclop::Worker.new({
-        "mongo" => {"database" => "cyclop_test"},
+        "mongo" => {"database" => Cyclop.db.name},
         "actions" => File.expand_path("../../fixtures/actions", __FILE__),
       }) 
     end
@@ -39,7 +39,7 @@ describe Cyclop::Worker do
     let(:worker) do
       Cyclop::Worker.new({
         "log_file" => File.expand_path("../../../test.log", __FILE__),
-        "mongo" => {"database" => "cyclop_test"},
+        "mongo" => {"database" => Cyclop.db.name},
         "actions" => File.expand_path("../../fixtures/actions", __FILE__),
       }) 
     end
@@ -95,7 +95,7 @@ describe Cyclop::Worker do
       let(:worker) do
         Cyclop::Worker.new({
           "log_file" => File.expand_path("../../../test.log", __FILE__),
-          "mongo" => {"database" => "cyclop_test"},
+          "mongo" => {"database" => Cyclop.db.name},
           "actions" => File.expand_path("../../fixtures/actions", __FILE__),
           "limit_to_host" => host,
         }) 
@@ -119,10 +119,10 @@ describe Cyclop::Worker do
       let(:worker) do
         Cyclop::Worker.new({
           "log_file" => File.expand_path("../../../test.log", __FILE__),
-          "mongo" => {"database" => "cyclop_test"},
+          "mongo" => {"database" => Cyclop.db.name},
           "actions" => File.expand_path("../../fixtures/actions", __FILE__),
           "die_after" => 1,
-        }) 
+        })
       end
       it "only processes specified number jobs" do
         job1 = Cyclop.push queue: "slow", job_params: ["tony@starkenterprises.com", :welcome]
