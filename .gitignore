@@ -5,3 +5,4 @@ pkg/*
 docs/
 *.log
 *.yml
+*.rbc
