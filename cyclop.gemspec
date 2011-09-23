@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_runtime_dependency("bson_ext", ["~> 1.3.1"])
-  s.add_runtime_dependency("mongo", ["~> 1.3.1"])
+  s.add_runtime_dependency("mongo", ["~> 1.3"])
   s.add_runtime_dependency("posix-spawn", ["~> 0.3.6"])
 
   s.add_development_dependency("rake", ["~> 0.8.7"])
