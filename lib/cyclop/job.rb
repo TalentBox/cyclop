@@ -80,7 +80,8 @@ module Cyclop
       # Returns the modified job
       conditions[:new] = true
 
-      new collection.find_and_modify conditions
+      job = collection.find_and_modify conditions
+      new job if job
     rescue Mongo::OperationFailure
       nil
     end
