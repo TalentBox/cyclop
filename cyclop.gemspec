@@ -11,6 +11,7 @@ Gem::Specification.new do |s|
   s.homepage    = "https://github.com/TalentBox/cyclop"
   s.summary     = "Job queue with MongoDB"
   s.description = "Job queue with MongoDB with emphasis on never losing any task even if worker fails hard (segfault)."
+  s.license     = "MIT"
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
