@@ -16,7 +16,7 @@ GEM
       bson (= 1.4.0)
     mustache (0.99.4)
     posix-spawn (0.3.6)
-    rake (0.8.7)
+    rake (13.0.1)
     redcarpet (1.17.2)
     rocco (0.8.2)
       mustache
@@ -35,6 +35,6 @@ PLATFORMS
 
 DEPENDENCIES
   cyclop!
-  rake (~> 0.8.7)
+  rake (~> 13.0.1)
   rocco (~> 0.7)
   rspec (~> 2.6.0)
